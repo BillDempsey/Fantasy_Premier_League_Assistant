@@ -2,68 +2,68 @@
 # ... the number of players to display this for...
 # ... and calls the relevant function to do so.
 
-def choose_metric(dataframe):
+def choose_metric(dataframe, df2, df3, df4, df5, df6,):
     chosen_metric = input("Choose one of the following metrics to display:\ntotal_points\npoints_per_game\nPPGPE\nep_this\nep_next\n\n") # include try/catch for anything other than strings (already done in function? Better to do it here.)
     nplayers = int(input("\nChoose how many players you want displayed:\n\n"))  # Include try/catch for anything other than positive integers
 
     if chosen_metric == 'PPGPE':
-        nplayers_PPGE(dataframe, nplayers)
+        nplayers_PPGE(dataframe, df2, df3, df4, df5, df6, nplayers)
     elif chosen_metric == 'points_per_game':
-        nplayers_PPG(dataframe, nplayers)
+        nplayers_PPG(dataframe, df2, df3, df4, df5, df6, nplayers)
     elif chosen_metric == 'total_points':
-        nplayers_total_points(dataframe, nplayers)
+        nplayers_total_points(dataframe, df2, df3, df4, df5, df6, nplayers)
     elif chosen_metric == 'ep_this':
-        nplayers_ep_this(dataframe, nplayers)
+        nplayers_ep_this(dataframe, df2, df3, df4, df5, df6, nplayers)
     elif chosen_metric == 'ep_next':
-        nplayers_ep_next(dataframe, nplayers)
+        nplayers_ep_next(dataframe, df2, df3, df4, df5, df6, nplayers)
     else:
         print('Invalid output for "metric" field')  # Maybe swap this for an earlier try/catch
 
 ##################################################################################################################################
 # All the functions which print out the n players leading the chosen metric
 
-def nplayers_PPGE(dataframe, nplayers):
+def nplayers_PPGE(dataframe, df2, df3, df4, df5, df6, nplayers):
     answer = int(input("\nWhat is the minimum number of points you want the players on display to have?\n\n"))
     ordered = dataframe.sort_values('ppg_per_euro', ascending=False)
     filtered = ordered[ordered['total_points'] > answer]
     top_n = filtered.head(nplayers)
     for i in top_n.index:
         playername = dataframe.loc[i, 'name']
-        player_report(dataframe, playername)
+        player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
-def nplayers_PPG(dataframe, nplayers):
+def nplayers_PPG(dataframe, df2, df3, df4, df5, df6, nplayers):
     top_n = dataframe.sort_values('points_per_game', ascending=False).head(nplayers)
     top_n_indices = top_n.index
     for i in top_n_indices:
         playername = dataframe.loc[i, 'name']
-        player_report(dataframe, playername)
+        player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
-def nplayers_total_points(dataframe, nplayers):
+def nplayers_total_points(dataframe, df2, df3, df4, df5, df6, nplayers):
     top_n = dataframe.sort_values('total_points', ascending=False).head(nplayers)
     top_n_indices = top_n.index
     for i in top_n_indices:
         playername = dataframe.loc[i, 'name']
-        player_report(dataframe, playername)
+        player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
-def nplayers_ep_this(dataframe, nplayers):
+def nplayers_ep_this(dataframe, df2, df3, df4, df5, df6, nplayers):
     top_n = dataframe.sort_values('ep_this', ascending=False).head(nplayers)
     top_n_indices = top_n.index
     for i in top_n_indices:
         playername = dataframe.loc[i, 'name']
-        player_report(dataframe, playername)
+        player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
-def nplayers_ep_next(dataframe, nplayers):
+def nplayers_ep_next(dataframe, df2, df3, df4, df5, df6, nplayers):
     top_n = dataframe.sort_values('ep_next', ascending=False).head(nplayers)
     top_n_indices = top_n.index
     for i in top_n_indices:
         playername = dataframe.loc[i, 'name']
-        player_report(dataframe, playername)
+        player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
 
 ##################################################################################################################################
 # Find a player by name in the dataframe and print out their data
 
-def player_report(dataframe, playername):
+def player_report(dataframe, df2, df3, df4, df5, df6, playername):
     # Include try/catch here, checking a) if the name exists b) if it's a duplicate
     # Maybe use combination of first and surnames instead in time
 
@@ -81,10 +81,10 @@ def player_report(dataframe, playername):
           f"Cost:\t\t {player['now_cost']:.1f} \t\t\t({get_player_ranking(dataframe,'now_cost', playername)})\n"
           f"PPG:\t\t {player['points_per_game']} \t\t\t({get_player_ranking(dataframe,'points_per_game', playername)})\n"
           f"PPGPE:\t\t {player['ppg_per_euro']:.3f} \t\t\t({get_player_ranking(dataframe,'ppg_per_euro', playername)})\n"
-          f"EP this:\t {player['ep_this']} \t({player['chance_of_playing_this_round']}%) \t({get_player_ranking(dataframe,'ep_this', playername)})\n"
-          f"EP next:\t {player['ep_next']} \t({player['chance_of_playing_next_round']}%) \t({get_player_ranking(dataframe,'ep_next', playername)})"
+          f"EP this:\t {player['ep_this']} \t({player['chance_of_playing_this_round']}%) \t\t({get_player_ranking(dataframe,'ep_this', playername)})\n"
+          f"EP next:\t {player['ep_next']} \t({player['chance_of_playing_next_round']}%) \t\t({get_player_ranking(dataframe,'ep_next', playername)})"
           )
-    
+    print_historical_data(playername, df2, df3, df4, df5, df6)
     # Add in : \n PPG percentile %s\n PPGPE percentile %s\n
     # return player
 
@@ -100,7 +100,7 @@ def get_player_ranking(dataframe, metric, playername):
 ##########################################################
 ##################################################################################################################################
 
-def get_historical_data_strings(playername, df_23_24, df_22_23, df_21_22, df_20_21, df_19_20):
+def print_historical_data(playername, df_23_24, df_22_23, df_21_22, df_20_21, df_19_20):
     def get_player_data(playername, df, season):
         try:
             player_row = df[df['name'] == playername]
