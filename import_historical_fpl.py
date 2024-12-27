@@ -30,5 +30,5 @@ initial_loading_work(df_20_21)
 initial_loading_work(df_19_20)
 
 functions_historical.choose_metric(df_current, df_23_24, df_22_23, df_21_22, df_20_21, df_19_20)
-#functions_historical.print_historical_data("Erling Haaland", df_23_24, df_22_23, df_21_22, df_20_21, df_19_20)
+
 

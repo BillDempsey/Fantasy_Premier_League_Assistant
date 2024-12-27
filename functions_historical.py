@@ -1,6 +1,6 @@
-# Function to take user input which chooses the metric to sort by...
-# ... the number of players to display this for...
-# ... and calls the relevant function to do so.
+# Function which allows user to choose a) the metric to sort by...
+# ... and b) the number of players to display this for...
+# ... It then calls the relevant nplayers function to do so.
 
 def choose_metric(dataframe, df2, df3, df4, df5, df6,):
     chosen_metric = input("Choose one of the following metrics to display:\ntotal_points\npoints_per_game\nPPGPE\nep_this\nep_next\n\n") # include try/catch for anything other than strings (already done in function? Better to do it here.)
@@ -20,7 +20,7 @@ def choose_metric(dataframe, df2, df3, df4, df5, df6,):
         print('Invalid output for "metric" field')  # Maybe swap this for an earlier try/catch
 
 ##################################################################################################################################
-# All the functions which print out the n players leading the chosen metric
+# All the functions which print out the n players at top of leaderboard for the chosen metric
 
 def nplayers_PPGE(dataframe, df2, df3, df4, df5, df6, nplayers):
     answer = int(input("\nWhat is the minimum number of points you want the players on display to have?\n\n"))
@@ -32,7 +32,10 @@ def nplayers_PPGE(dataframe, df2, df3, df4, df5, df6, nplayers):
         player_report(dataframe, df2, df3, df4, df5, df6, playername)
 
 def nplayers_PPG(dataframe, df2, df3, df4, df5, df6, nplayers):
-    top_n = dataframe.sort_values('points_per_game', ascending=False).head(nplayers)
+    answer = int(input("\nWhat is the minimum number of points you want the players on display to have?\n\n"))
+    ordered = dataframe.sort_values('points_per_game', ascending=False)
+    filtered = ordered[ordered['total_points'] > answer]
+    top_n = filtered.head(nplayers)
     top_n_indices = top_n.index
     for i in top_n_indices:
         playername = dataframe.loc[i, 'name']
@@ -65,14 +68,12 @@ def nplayers_ep_next(dataframe, df2, df3, df4, df5, df6, nplayers):
 
 def player_report(dataframe, df2, df3, df4, df5, df6, playername):
     # Include try/catch here, checking a) if the name exists b) if it's a duplicate
-    # Maybe use combination of first and surnames instead in time
 
     # Set up a kind of fuzzy match to catch the names if spelled incorrectly. 
     # Also account for 2 similar/same names
     player = dataframe[dataframe['name'] == playername].iloc[0]
     position = {1: 'GK', 2: 'Def', 3: 'Mid', 4: 'Fwd'}
     
-    #Change the %s to %d when converting the points to decimals later
     player_element_type = int(player['element_type'])
     print(" \n")
     print(f"Player:\t\t {player['name']}\n"
@@ -81,11 +82,10 @@ def player_report(dataframe, df2, df3, df4, df5, df6, playername):
           f"Cost:\t\t {player['now_cost']:.1f} \t\t\t({get_player_ranking(dataframe,'now_cost', playername)})\n"
           f"PPG:\t\t {player['points_per_game']} \t\t\t({get_player_ranking(dataframe,'points_per_game', playername)})\n"
           f"PPGPE:\t\t {player['ppg_per_euro']:.3f} \t\t\t({get_player_ranking(dataframe,'ppg_per_euro', playername)})\n"
-          f"EP this:\t {player['ep_this']} \t({player['chance_of_playing_this_round']}%) \t\t({get_player_ranking(dataframe,'ep_this', playername)})\n"
+          f"EP this:\t {player['ep_this']} \t({player['chance_of_playing_this_round']}%) \t({get_player_ranking(dataframe,'ep_this', playername)})\n"
           f"EP next:\t {player['ep_next']} \t({player['chance_of_playing_next_round']}%) \t\t({get_player_ranking(dataframe,'ep_next', playername)})"
           )
     print_historical_data(playername, df2, df3, df4, df5, df6)
-    # Add in : \n PPG percentile %s\n PPGPE percentile %s\n
     # return player
 
 #######################################################
@@ -93,12 +93,18 @@ def player_report(dataframe, df2, df3, df4, df5, df6, playername):
 def get_player_ranking(dataframe, metric, playername):
     sorted_df = dataframe.sort_values(metric, ascending=False)
     sorted_df.reset_index(drop=True, inplace=True) # Reset the index of the sorted DataFrame so that the positions reflect the new order
-    player_index = sorted_df[sorted_df['name'] == playername].index[0] # If indexError, name is probably incorrect PREVENT W/ T/C
-    ranking = player_index + 1
+    try:
+        player_index = sorted_df[sorted_df['name'] == playername].index[0] # If indexError, name is probably incorrect PREVENT W/ T/C
+        ranking = player_index + 1
+    except:
+        ranking = 0
     return ranking
 
 ##########################################################
 ##################################################################################################################################
+#  Print out a given player's total points and PPG for the past 5 seasons.
+#  If no data is available for a given season, it will not be referenced.           CHANGE IN TIME, WHEN YOU WANT TO RETURN VALUES RATHER THAN PRINT THEM 
+#  If no data is found for any of the seasons, then a message will be outputted
 
 def print_historical_data(playername, df_23_24, df_22_23, df_21_22, df_20_21, df_19_20):
     def get_player_data(playername, df, season):
@@ -109,7 +115,7 @@ def print_historical_data(playername, df_23_24, df_22_23, df_21_22, df_20_21, df
             else:
                 return None
         except Exception:
-            print(f"The name {playername} could not be found for the {season} season")
+            #print(f"The name {playername} could not be found for the {season} season") # Was clogging up the output
             return None
 
     playerdata_23_24 = get_player_data(playername, df_23_24, season="2023/24")
@@ -130,7 +136,7 @@ def print_historical_data(playername, df_23_24, df_22_23, df_21_22, df_20_21, df
     if playerdata_19_20 is not None:
         output_1 += f"2019/20\t Points: {playerdata_19_20['total_points']} \t PPG: {playerdata_19_20['points_per_game']}\n"
 
-    if output_1 == "":
-        output_1 = f"No data available for player: {playername}"
+    # if output_1 == "":
+    #     output_1 = f"No data available for player: {playername}"          # Was clogging up the output
         
     print(output_1)
