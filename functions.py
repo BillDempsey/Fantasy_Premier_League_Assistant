@@ -1,3 +1,7 @@
+#### functions.py
+import decimal
+from fuzzywuzzy import process
+
 # Function to take user input which chooses the metric to sort by...
 # ... the number of players to display this for...
 # ... and calls the relevant function to do so.
@@ -96,7 +100,11 @@ def player_report(playername, league_teams, dataframe):
 def get_player_ranking(dataframe, metric, playername):
     sorted_df = dataframe.sort_values(metric, ascending=False)
     sorted_df.reset_index(drop=True, inplace=True) # Reset the index of the sorted DataFrame so that the positions reflect the new order
-    player_index = sorted_df[sorted_df['name'] == playername].index[0] # If indexError, name is probably incorrect PREVENT W/ T/C
+    try:
+        player_index = sorted_df[sorted_df['name'] == playername].index[0]
+    except IndexError:
+        print(f"Player named {playername} not found by get_player_ranking() function.")
+        return None
     ranking = player_index + 1
     return ranking
 
@@ -104,14 +112,20 @@ def get_player_ranking(dataframe, metric, playername):
 
 def print_history(playername, df_current):
     def get_player_data(playername, df_current):
+
         try:
-            player_row = df_current[df_current['name'] == playername]
-            if not player_row.empty:
+            # Perform fuzzy matching
+            names_list = df_current['name'].tolist()  # Get all names as a list
+            match, score = process.extractOne(playername, names_list)  # Find the best match
+            
+            if score > 80:  # Adjust threshold as needed
+                player_row = df_current[df_current['name'] == match]
                 return player_row.iloc[0]
             else:
-                return None
-        except Exception:
-            print(f"The name {playername} could not be found.")
+                print(f"No close match found for {playername}")
+
+        except Exception as e:
+            print(f"Error occurred: {e}")
             return None
 
     # Define the historical data columns
@@ -162,3 +176,13 @@ def store_historical_data(df_current, df_23_24, df_22_23, df_21_22, df_20_21, df
                     df_current.loc[df_current['name'] == player, f'PPG_{season_label}'] = player_data['points_per_game'].values[0]
             except Exception as e:
                 print(f"Error processing player {player} for season {season_label}: {e}")
+
+##################################################
+
+def sort_out_columns(df):
+    # Come back and make integers of all numerical columns
+    df['points_per_game'] = df['points_per_game'].astype(float).round(2)
+    df['now_cost'] = df['now_cost'].astype(float) / 10
+    df['name'] = df['first_name'] + " " + df['second_name']
+    df['ppg_per_euro'] = (df['points_per_game'] / df['now_cost']).round(3)
+    return df
