@@ -28,3 +28,4 @@ Planned improvements include:
 
 2. Build an algorithm to evaluate how upcoming fixtures affect the cost-effectiveness of each player 
 
+3. FOR NOW- UPLOAD VERSION OF CODE WITH GUI TO GIT REPOSITORY
