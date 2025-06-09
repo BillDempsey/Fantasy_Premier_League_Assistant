@@ -2,7 +2,7 @@
 
 This is a Python script that returns statistics for Fantasy Premier League (FPL) players over the past number of years. It calculates:
 
-- **PPG (Points Per Game)** – a measure of player productivity
+- **PPG (Points Per Game)** – simplest measure of player performance, taking games missed into account
 - **PPGPE (Points Per Game Per Euro)** – a custom metric to evaluate the cost-effectiveness of each player
 
 The goal is to help inform team selection based on both performance and value.
