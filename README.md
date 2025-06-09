@@ -24,22 +24,7 @@ This allows for a balance between premium performers and good value picks across
 
 Planned improvements include:
 
-1. **Evaluating Optimality**  
-   Determine whether this current strategy is actually optimal, using more rigorous data-driven methods.
+1. Determine whether this current strategy is actually optimal, using Monte Carlo analysis... will first need to build framework for points scoring system etc.
 
-2. **Fixture-Aware Cost Effectiveness**  
-   Build an algorithm to evaluate how upcoming fixtures affect the cost-effectiveness of each player — adjusting PPGPE dynamically based on opponent difficulty and other factors.
+2. Build an algorithm to evaluate how upcoming fixtures affect the cost-effectiveness of each player 
 
----
-
-## ▶How to Use
-
-### Requirements
-
-- Python 3.7 or higher
-- Dependencies listed in `requirements.txt`
-
-Install dependencies with:
-
-```bash
-pip install -r requirements.txt
